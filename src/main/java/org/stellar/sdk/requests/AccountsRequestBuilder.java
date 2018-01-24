@@ -1,13 +1,11 @@
 package org.stellar.sdk.requests;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.launchdarkly.eventsource.EventHandler;
 import com.launchdarkly.eventsource.EventSource;
 import com.launchdarkly.eventsource.MessageEvent;
 
 import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.federation.FederationResponse;
 import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.Page;
@@ -60,8 +58,9 @@ public class AccountsRequestBuilder extends RequestBuilder {
      * @throws IOException
      */
     public Page<AccountResponse> execute(URI uri) throws IOException, TooManyRequestsException {
+        TypeToken type = new TypeToken<Page<AccountResponse>>() {};
         Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), Page<AccountResponse>.class);
+        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
     }
 
     /**

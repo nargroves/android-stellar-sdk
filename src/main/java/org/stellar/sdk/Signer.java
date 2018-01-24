@@ -10,9 +10,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Signer is a helper class that creates {@link org.stellar.sdk.xdr.SignerKey} objects.
  */
 public class Signer {
+
     /**
      * Create <code>ed25519PublicKey</code> {@link org.stellar.sdk.xdr.SignerKey} from
      * a {@link org.stellar.sdk.KeyPair}
+     *
      * @param keyPair
      * @return org.stellar.sdk.xdr.SignerKey
      */
@@ -24,6 +26,7 @@ public class Signer {
     /**
      * Create <code>sha256Hash</code> {@link org.stellar.sdk.xdr.SignerKey} from
      * a sha256 hash of a preimage.
+     *
      * @param hash
      * @return org.stellar.sdk.xdr.SignerKey
      */
@@ -41,6 +44,7 @@ public class Signer {
     /**
      * Create <code>preAuthTx</code> {@link org.stellar.sdk.xdr.SignerKey} from
      * a {@link org.stellar.sdk.xdr.Transaction} hash.
+     *
      * @param tx
      * @return org.stellar.sdk.xdr.SignerKey
      */
@@ -58,6 +62,7 @@ public class Signer {
     /**
      * Create <code>preAuthTx</code> {@link org.stellar.sdk.xdr.SignerKey} from
      * a transaction hash.
+     *
      * @param hash
      * @return org.stellar.sdk.xdr.SignerKey
      */

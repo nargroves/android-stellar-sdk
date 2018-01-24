@@ -5,21 +5,12 @@ import com.launchdarkly.eventsource.EventHandler;
 import com.launchdarkly.eventsource.EventSource;
 import com.launchdarkly.eventsource.MessageEvent;
 
-import org.apache.http.client.fluent.Request;
-import org.glassfish.jersey.media.sse.EventSource;
-import org.glassfish.jersey.media.sse.InboundEvent;
-import org.glassfish.jersey.media.sse.SseFeature;
-import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.LedgerResponse;
 import org.stellar.sdk.responses.Page;
 
 import java.io.IOException;
 import java.net.URI;
-
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -66,10 +57,9 @@ public class LedgersRequestBuilder extends RequestBuilder {
      * @throws IOException
      */
     public Page<LedgerResponse> execute(URI uri) throws IOException, TooManyRequestsException {
-        TypeToken type = new TypeToken<Page<LedgerResponse>>() {
-        };
-        ResponseHandler<Page<LedgerResponse>> responseHandler = new ResponseHandler<Page<LedgerResponse>>(type);
-        return (Page<LedgerResponse>) Request.Get(uri).execute().handleResponse(responseHandler);
+        TypeToken type = new TypeToken<Page<LedgerResponse>>() {};
+        Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
+        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
     }
 
     /**

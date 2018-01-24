@@ -2,10 +2,10 @@ package org.stellar.sdk.requests;
 
 import com.google.gson.reflect.TypeToken;
 
-import org.apache.http.client.fluent.Request;
 import org.stellar.sdk.Asset;
 import org.stellar.sdk.AssetTypeCreditAlphaNum;
 import org.stellar.sdk.KeyPair;
+import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.Page;
 import org.stellar.sdk.responses.PathResponse;
 
@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.net.URI;
 
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Builds requests connected to paths.
@@ -53,10 +55,9 @@ public class PathsRequestBuilder extends RequestBuilder {
      * @throws IOException
      */
     public Page<PathResponse> execute(URI uri) throws IOException, TooManyRequestsException {
-        TypeToken type = new TypeToken<Page<PathResponse>>() {
-        };
-        ResponseHandler<Page<PathResponse>> responseHandler = new ResponseHandler<Page<PathResponse>>(type);
-        return (Page<PathResponse>) Request.Get(uri).execute().handleResponse(responseHandler);
+        TypeToken type = new TypeToken<Page<PathResponse>>() {};
+        Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
+        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
     }
 
     /**

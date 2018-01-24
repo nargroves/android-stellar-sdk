@@ -5,12 +5,7 @@ import com.launchdarkly.eventsource.EventHandler;
 import com.launchdarkly.eventsource.EventSource;
 import com.launchdarkly.eventsource.MessageEvent;
 
-import org.apache.http.client.fluent.Request;
-import org.glassfish.jersey.media.sse.EventSource;
-import org.glassfish.jersey.media.sse.InboundEvent;
-import org.glassfish.jersey.media.sse.SseFeature;
 import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.Page;
 import org.stellar.sdk.responses.effects.EffectResponse;
@@ -18,12 +13,9 @@ import org.stellar.sdk.responses.effects.EffectResponse;
 import java.io.IOException;
 import java.net.URI;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -90,11 +82,10 @@ public class EffectsRequestBuilder extends RequestBuilder {
      * @throws TooManyRequestsException when too many requests were sent to the Horizon server.
      * @throws IOException
      */
-    public static Page<EffectResponse> execute(URI uri) throws IOException, TooManyRequestsException {
-        TypeToken type = new TypeToken<Page<EffectResponse>>() {
-        };
-        ResponseHandler<Page<EffectResponse>> responseHandler = new ResponseHandler<Page<EffectResponse>>(type);
-        return (Page<EffectResponse>) Request.Get(uri).execute().handleResponse(responseHandler);
+    public Page<EffectResponse> execute(URI uri) throws IOException, TooManyRequestsException {
+        TypeToken type = new TypeToken<Page<EffectResponse>>() {};
+        Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
+        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
     }
 
     /**

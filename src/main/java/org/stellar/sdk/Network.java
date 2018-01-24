@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * {@link Network#use(Network)}, {@link Network#usePublicNetwork()} or {@link Network#useTestNetwork()}.
  */
 public class Network {
+
     private final static String PUBLIC = "Public Global Stellar Network ; September 2015";
     private final static String TESTNET = "Test SDF Network ; September 2015";
     private static Network current;
@@ -20,6 +21,7 @@ public class Network {
 
     /**
      * Creates a new Network object to represent a network with a given passphrase
+     *
      * @param networkPassphrase
      */
     public Network(String networkPassphrase) {
@@ -49,6 +51,7 @@ public class Network {
 
     /**
      * Use <code>network</code> as a current network.
+     *
      * @param network Network object to set as current network
      */
     public static void use(Network network) {

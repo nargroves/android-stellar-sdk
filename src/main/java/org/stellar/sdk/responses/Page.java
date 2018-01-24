@@ -8,6 +8,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import okhttp3.Request;
+
 /**
  * Represents page of objects.
  *
@@ -40,11 +42,10 @@ public class Page<T> extends Response {
         if (this.getLinks().getNext() == null) {
             return null;
         }
-        TypeToken type = new TypeToken<Page<T>>() {
-        };
-        ResponseHandler<Page<T>> responseHandler = new ResponseHandler<Page<T>>(type);
+        TypeToken type = new TypeToken<Page<T>>() {};
         URI uri = new URI(this.getLinks().getNext().getHref());
-        return (Page<T>) Request.Get(uri).execute().handleResponse(responseHandler);
+        okhttp3.Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
+        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
     }
 
     /**

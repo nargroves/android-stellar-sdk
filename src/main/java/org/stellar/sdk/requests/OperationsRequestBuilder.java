@@ -92,10 +92,9 @@ public class OperationsRequestBuilder extends RequestBuilder {
      * @throws IOException
      */
     public Page<OperationResponse> execute(URI uri) throws IOException, TooManyRequestsException {
-        TypeToken type = new TypeToken<Page<OperationResponse>>() {
-        };
-        ResponseHandler<Page<OperationResponse>> responseHandler = new ResponseHandler<Page<OperationResponse>>(type);
-        return (Page<OperationResponse>) Request.Get(uri).execute().handleResponse(responseHandler);
+        TypeToken type = new TypeToken<Page<OperationResponse>>() {};
+        Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
+        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
     }
 
     /**

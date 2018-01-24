@@ -8,6 +8,7 @@ import com.google.common.net.InternetDomainName;
  * @see <a href="https://www.stellar.org/developers/learn/concepts/federation.html" target="_blank">Federation docs</a>
  */
 public class Federation {
+
     private Federation() {
     }
 

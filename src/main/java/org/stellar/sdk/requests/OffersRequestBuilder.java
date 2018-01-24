@@ -2,8 +2,8 @@ package org.stellar.sdk.requests;
 
 import com.google.gson.reflect.TypeToken;
 
-import org.apache.http.client.fluent.Request;
 import org.stellar.sdk.KeyPair;
+import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.OfferResponse;
 import org.stellar.sdk.responses.Page;
 
@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.net.URI;
 
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -43,11 +45,10 @@ public class OffersRequestBuilder extends RequestBuilder {
      * @throws TooManyRequestsException when too many requests were sent to the Horizon server.
      * @throws IOException
      */
-    public static Page<OfferResponse> execute(URI uri) throws IOException, TooManyRequestsException {
-        TypeToken type = new TypeToken<Page<OfferResponse>>() {
-        };
-        ResponseHandler<Page<OfferResponse>> responseHandler = new ResponseHandler<Page<OfferResponse>>(type);
-        return (Page<OfferResponse>) Request.Get(uri).execute().handleResponse(responseHandler);
+    public Page<OfferResponse> execute(URI uri) throws IOException, TooManyRequestsException {
+        TypeToken type = new TypeToken<Page<OfferResponse>>() {};
+        Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
+        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
     }
 
     /**

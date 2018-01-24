@@ -6,7 +6,6 @@ import com.launchdarkly.eventsource.EventSource;
 import com.launchdarkly.eventsource.MessageEvent;
 
 import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.Page;
 import org.stellar.sdk.responses.operations.OperationResponse;
@@ -15,6 +14,8 @@ import java.io.IOException;
 import java.net.URI;
 
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -70,11 +71,10 @@ public class PaymentsRequestBuilder extends RequestBuilder {
      * @throws TooManyRequestsException when too many requests were sent to the Horizon server.
      * @throws IOException
      */
-    public static Page<OperationResponse> execute(URI uri) throws IOException, TooManyRequestsException {
-        TypeToken type = new TypeToken<Page<OperationResponse>>() {
-        };
-        ResponseHandler<Page<OperationResponse>> responseHandler = new ResponseHandler<Page<OperationResponse>>(type);
-        return (Page<OperationResponse>) Request.Get(uri).execute().handleResponse(responseHandler);
+    public Page<OperationResponse> execute(URI uri) throws IOException, TooManyRequestsException {
+        TypeToken type = new TypeToken<Page<OperationResponse>>() {};
+        Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
+        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
     }
 
     /**

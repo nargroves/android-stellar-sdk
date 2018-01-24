@@ -1,6 +1,7 @@
 package org.stellar.sdk.responses;
 
 import com.google.gson.annotations.SerializedName;
+
 import org.stellar.sdk.Asset;
 import org.stellar.sdk.Price;
 
@@ -8,11 +9,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents order book response.
+ *
  * @see <a href="https://www.stellar.org/developers/horizon/reference/resources/orderbook.html" target="_blank">Order book documentation</a>
  * @see org.stellar.sdk.requests.OrderBookRequestBuilder
  * @see org.stellar.sdk.Server#orderBook()
  */
 public class OrderBookResponse extends Response {
+
     @SerializedName("base")
     private final Asset base;
     @SerializedName("counter")

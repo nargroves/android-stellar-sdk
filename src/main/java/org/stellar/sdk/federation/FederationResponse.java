@@ -8,6 +8,7 @@ import com.google.gson.annotations.SerializedName;
  * @see <a href="https://www.stellar.org/developers/learn/concepts/federation.html" target="_blank">Federation docs</a>
  */
 public class FederationResponse {
+
     @SerializedName("stellar_address")
     private final String stellarAddress;
     @SerializedName("account_id")

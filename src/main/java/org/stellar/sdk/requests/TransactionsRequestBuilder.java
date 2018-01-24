@@ -5,12 +5,7 @@ import com.launchdarkly.eventsource.EventHandler;
 import com.launchdarkly.eventsource.EventSource;
 import com.launchdarkly.eventsource.MessageEvent;
 
-import org.apache.http.client.fluent.Request;
-import org.glassfish.jersey.media.sse.EventSource;
-import org.glassfish.jersey.media.sse.InboundEvent;
-import org.glassfish.jersey.media.sse.SseFeature;
 import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.Page;
 import org.stellar.sdk.responses.TransactionResponse;
@@ -18,11 +13,9 @@ import org.stellar.sdk.responses.TransactionResponse;
 import java.io.IOException;
 import java.net.URI;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,10 +35,8 @@ public class TransactionsRequestBuilder extends RequestBuilder {
      * @throws IOException
      */
     public TransactionResponse transaction(URI uri) throws IOException {
-        TypeToken type = new TypeToken<TransactionResponse>() {
-        };
-        ResponseHandler<TransactionResponse> responseHandler = new ResponseHandler<TransactionResponse>(type);
-        return (TransactionResponse) Request.Get(uri).execute().handleResponse(responseHandler);
+        Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
+        return GsonSingleton.getInstance().fromJson(response.body().toString(), TransactionResponse.class);
     }
 
     /**
@@ -91,11 +82,10 @@ public class TransactionsRequestBuilder extends RequestBuilder {
      * @throws TooManyRequestsException when too many requests were sent to the Horizon server.
      * @throws IOException
      */
-    public static Page<TransactionResponse> execute(URI uri) throws IOException, TooManyRequestsException {
-        TypeToken type = new TypeToken<Page<TransactionResponse>>() {
-        };
-        ResponseHandler<Page<TransactionResponse>> responseHandler = new ResponseHandler<Page<TransactionResponse>>(type);
-        return (Page<TransactionResponse>) Request.Get(uri).execute().handleResponse(responseHandler);
+    public Page<TransactionResponse> execute(URI uri) throws IOException, TooManyRequestsException {
+        TypeToken type = new TypeToken<Page<TransactionResponse>>() {};
+        Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
+        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
     }
 
     /**

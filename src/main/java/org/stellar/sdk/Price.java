@@ -1,6 +1,7 @@
 package org.stellar.sdk;
 
 import com.google.gson.annotations.SerializedName;
+
 import org.stellar.sdk.xdr.Int32;
 
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Represents Price. Price in Stellar is represented as a fraction.
  */
 public class Price {
+
     @SerializedName("n")
     private final int n;
     @SerializedName("d")
@@ -20,6 +22,7 @@ public class Price {
 
     /**
      * Create a new price. Price in Stellar is represented as a fraction.
+     *
      * @param n numerator
      * @param d denominator
      */
@@ -46,6 +49,7 @@ public class Price {
      * Approximates <code>price</code> to a fraction.
      * Please remember that this function can give unexpected results for values that cannot be represented as a
      * fraction with 32-bit numerator and denominator. It's safer to create a Price object using the constructor.
+     *
      * @param price Ex. "1.25"
      */
     public static Price fromString(String price) {
@@ -76,8 +80,8 @@ public class Price {
             number = new BigDecimal(1).divide(f, 20, BigDecimal.ROUND_HALF_UP);
             i = i + 1;
         }
-        BigDecimal n = fractions.get(fractions.size()-1)[0];
-        BigDecimal d = fractions.get(fractions.size()-1)[1];
+        BigDecimal n = fractions.get(fractions.size() - 1)[0];
+        BigDecimal d = fractions.get(fractions.size() - 1)[1];
         return new Price(n.intValue(), d.intValue());
     }
 

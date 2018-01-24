@@ -8,6 +8,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents <a href="https://www.stellar.org/developers/learn/concepts/list-of-operations.html#account-merge" target="_blank">AccountMerge</a> operation.
+ *
  * @see <a href="https://www.stellar.org/developers/learn/concepts/list-of-operations.html" target="_blank">List of Operations</a>
  */
 public class AccountMergeOperation extends Operation {
@@ -37,6 +38,7 @@ public class AccountMergeOperation extends Operation {
 
     /**
      * Builds AccountMerge operation.
+     *
      * @see AccountMergeOperation
      */
     public static class Builder {
@@ -50,6 +52,7 @@ public class AccountMergeOperation extends Operation {
 
         /**
          * Creates a new AccountMerge builder.
+         *
          * @param destination The account that receives the remaining XLM balance of the source account.
          */
         public Builder(KeyPair destination) {
@@ -58,6 +61,7 @@ public class AccountMergeOperation extends Operation {
 
         /**
          * Set source account of this operation
+         *
          * @param sourceAccount Source account
          * @return Builder object so you can chain methods.
          */
