@@ -43,7 +43,7 @@ public class OrderBookRequestBuilder extends RequestBuilder {
 
     public OrderBookResponse execute(URI uri) throws IOException, TooManyRequestsException {
         Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), OrderBookResponse.class);
+        return GsonSingleton.getInstance().fromJson(response.body().string(), OrderBookResponse.class);
     }
 
     public OrderBookResponse execute() throws IOException, TooManyRequestsException {

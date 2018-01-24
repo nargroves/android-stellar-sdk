@@ -43,7 +43,7 @@ public class TradesRequestBuilder extends RequestBuilder {
 
     public TradeResponse execute(URI uri) throws IOException, TooManyRequestsException {
         Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), TradeResponse.class);
+        return GsonSingleton.getInstance().fromJson(response.body().string(), TradeResponse.class);
     }
 
     public TradeResponse execute() throws IOException, TooManyRequestsException {

@@ -85,7 +85,7 @@ public class EffectsRequestBuilder extends RequestBuilder {
     public Page<EffectResponse> execute(URI uri) throws IOException, TooManyRequestsException {
         TypeToken type = new TypeToken<Page<EffectResponse>>() {};
         Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
+        return GsonSingleton.getInstance().fromJson(response.body().string(), type.getType());
     }
 
     /**

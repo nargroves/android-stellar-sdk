@@ -33,7 +33,7 @@ public class LedgersRequestBuilder extends RequestBuilder {
      */
     public LedgerResponse ledger(URI uri) throws IOException {
         Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), LedgerResponse.class);
+        return GsonSingleton.getInstance().fromJson(response.body().string(), LedgerResponse.class);
     }
 
     /**
@@ -59,7 +59,7 @@ public class LedgersRequestBuilder extends RequestBuilder {
     public Page<LedgerResponse> execute(URI uri) throws IOException, TooManyRequestsException {
         TypeToken type = new TypeToken<Page<LedgerResponse>>() {};
         Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
+        return GsonSingleton.getInstance().fromJson(response.body().string(), type.getType());
     }
 
     /**

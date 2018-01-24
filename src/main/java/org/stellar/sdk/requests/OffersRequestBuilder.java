@@ -48,7 +48,7 @@ public class OffersRequestBuilder extends RequestBuilder {
     public Page<OfferResponse> execute(URI uri) throws IOException, TooManyRequestsException {
         TypeToken type = new TypeToken<Page<OfferResponse>>() {};
         Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
+        return GsonSingleton.getInstance().fromJson(response.body().string(), type.getType());
     }
 
     /**

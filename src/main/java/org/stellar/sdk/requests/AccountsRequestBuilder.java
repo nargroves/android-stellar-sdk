@@ -33,8 +33,9 @@ public class AccountsRequestBuilder extends RequestBuilder {
      * @throws IOException
      */
     public AccountResponse account(URI uri) throws IOException {
+        TypeToken type = new TypeToken<AccountResponse>() {};
         Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), AccountResponse.class);
+        return GsonSingleton.getInstance().fromJson(response.body().string(), type.getType());
     }
 
     /**
@@ -60,7 +61,7 @@ public class AccountsRequestBuilder extends RequestBuilder {
     public Page<AccountResponse> execute(URI uri) throws IOException, TooManyRequestsException {
         TypeToken type = new TypeToken<Page<AccountResponse>>() {};
         Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
+        return GsonSingleton.getInstance().fromJson(response.body().string(), type.getType());
     }
 
     /**

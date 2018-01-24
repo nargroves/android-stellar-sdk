@@ -89,9 +89,7 @@ public class FederationServer {
                 throw new StellarTomlNotFoundInvalidException();
             }
 
-            String responseString = response.body().toString();
-            response.body().close();
-
+            String responseString = response.body().string();
             stellarToml = GsonSingleton.getInstance().fromJson(responseString, Toml.class);
         } catch (IOException e) {
             throw new ConnectionErrorException();
@@ -138,7 +136,7 @@ public class FederationServer {
             } else if (!response.isSuccessful()) {
                 throw new ServerErrorException();
             }
-            return GsonSingleton.getInstance().fromJson(response.body().toString(), FederationResponse.class);
+            return GsonSingleton.getInstance().fromJson(response.body().string(), FederationResponse.class);
         } catch (IOException e) {
             throw new ConnectionErrorException();
         }

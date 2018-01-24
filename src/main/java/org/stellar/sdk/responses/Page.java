@@ -47,7 +47,7 @@ public class Page<T> extends Response {
         URI uri = new URI(this.getLinks().getNext().getHref());
         OkHttpClient httpClient = new OkHttpClient();
         okhttp3.Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
+        return GsonSingleton.getInstance().fromJson(response.body().string(), type.getType());
     }
 
     /**

@@ -57,7 +57,7 @@ public class PathsRequestBuilder extends RequestBuilder {
     public Page<PathResponse> execute(URI uri) throws IOException, TooManyRequestsException {
         TypeToken type = new TypeToken<Page<PathResponse>>() {};
         Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
+        return GsonSingleton.getInstance().fromJson(response.body().string(), type.getType());
     }
 
     /**

@@ -36,7 +36,7 @@ public class TransactionsRequestBuilder extends RequestBuilder {
      */
     public TransactionResponse transaction(URI uri) throws IOException {
         Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), TransactionResponse.class);
+        return GsonSingleton.getInstance().fromJson(response.body().string(), TransactionResponse.class);
     }
 
     /**
@@ -85,7 +85,7 @@ public class TransactionsRequestBuilder extends RequestBuilder {
     public Page<TransactionResponse> execute(URI uri) throws IOException, TooManyRequestsException {
         TypeToken type = new TypeToken<Page<TransactionResponse>>() {};
         Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
+        return GsonSingleton.getInstance().fromJson(response.body().string(), type.getType());
     }
 
     /**

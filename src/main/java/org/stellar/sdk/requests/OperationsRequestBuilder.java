@@ -33,7 +33,7 @@ public class OperationsRequestBuilder extends RequestBuilder {
      */
     public OperationResponse operation(URI uri) throws IOException {
         Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), OperationResponse.class);
+        return GsonSingleton.getInstance().fromJson(response.body().string(), OperationResponse.class);
     }
 
     /**
@@ -94,7 +94,7 @@ public class OperationsRequestBuilder extends RequestBuilder {
     public Page<OperationResponse> execute(URI uri) throws IOException, TooManyRequestsException {
         TypeToken type = new TypeToken<Page<OperationResponse>>() {};
         Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
-        return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
+        return GsonSingleton.getInstance().fromJson(response.body().string(), type.getType());
     }
 
     /**
