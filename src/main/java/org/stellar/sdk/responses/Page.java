@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 /**
@@ -44,6 +45,7 @@ public class Page<T> extends Response {
         }
         TypeToken type = new TypeToken<Page<T>>() {};
         URI uri = new URI(this.getLinks().getNext().getHref());
+        OkHttpClient httpClient = new OkHttpClient();
         okhttp3.Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
         return GsonSingleton.getInstance().fromJson(response.body().toString(), type.getType());
     }

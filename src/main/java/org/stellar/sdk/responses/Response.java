@@ -1,15 +1,17 @@
 package org.stellar.sdk.responses;
 
+import okhttp3.Headers;
+
 public abstract class Response {
 
     protected int rateLimitLimit;
     protected int rateLimitRemaining;
     protected int rateLimitReset;
 
-    public void setHeaders(Header limit, Header remaining, Header reset) {
-        this.rateLimitLimit = Integer.parseInt(limit.getValue());
-        this.rateLimitRemaining = Integer.parseInt(remaining.getValue());
-        this.rateLimitReset = Integer.parseInt(reset.getValue());
+    public void setHeaders(Headers limit, Headers remaining, Headers reset) {
+        this.rateLimitLimit = Integer.parseInt(limit.value(0));
+        this.rateLimitRemaining = Integer.parseInt(remaining.value(0));
+        this.rateLimitReset = Integer.parseInt(reset.value(0));
     }
 
     /**

@@ -79,11 +79,9 @@ public abstract class RequestBuilder {
 
     URI buildUri() {
         if (segments.size() > 0) {
-            String path = "";
             for (String segment : segments) {
-                path += "/" + segment;
+                urlBuilder.addPathSegment(segment);
             }
-            uriBuilder.setPath(path);
         }
         return urlBuilder.build().uri();
     }

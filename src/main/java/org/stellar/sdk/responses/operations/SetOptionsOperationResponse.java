@@ -12,7 +12,7 @@ import org.stellar.sdk.KeyPair;
  * @see org.stellar.sdk.Server#operations()
  */
 public class SetOptionsOperationResponse extends OperationResponse {
-  
+
     @SerializedName("low_threshold")
     protected final Integer lowThreshold;
     @SerializedName("med_threshold")
