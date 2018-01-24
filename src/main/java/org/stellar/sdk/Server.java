@@ -21,6 +21,7 @@ import retrofit2.Retrofit;
  * Main class used to connect to Horizon server.
  */
 public class Server {
+
     private URI serverURI;
     private OkHttpClient httpClient = new OkHttpClient();
 
@@ -43,67 +44,68 @@ public class Server {
      * Returns {@link EffectsRequestBuilder} instance.
      */
     public EffectsRequestBuilder effects() {
-        return new EffectsRequestBuilder(serverURI);
+        return new EffectsRequestBuilder(httpClient, serverURI);
     }
 
     /**
      * Returns {@link LedgersRequestBuilder} instance.
      */
     public LedgersRequestBuilder ledgers() {
-        return new LedgersRequestBuilder(serverURI);
+        return new LedgersRequestBuilder(httpClient, serverURI);
     }
 
     /**
      * Returns {@link OffersRequestBuilder} instance.
      */
     public OffersRequestBuilder offers() {
-        return new OffersRequestBuilder(serverURI);
+        return new OffersRequestBuilder(httpClient, serverURI);
     }
 
     /**
      * Returns {@link OperationsRequestBuilder} instance.
      */
     public OperationsRequestBuilder operations() {
-        return new OperationsRequestBuilder(serverURI);
+        return new OperationsRequestBuilder(httpClient, serverURI);
     }
 
     /**
      * Returns {@link OrderBookRequestBuilder} instance.
      */
     public OrderBookRequestBuilder orderBook() {
-        return new OrderBookRequestBuilder(serverURI);
+        return new OrderBookRequestBuilder(httpClient, serverURI);
     }
 
     /**
      * Returns {@link TradesRequestBuilder} instance.
      */
     public TradesRequestBuilder trades() {
-        return new TradesRequestBuilder(serverURI);
+        return new TradesRequestBuilder(httpClient, serverURI);
     }
 
     /**
      * Returns {@link PathsRequestBuilder} instance.
      */
     public PathsRequestBuilder paths() {
-        return new PathsRequestBuilder(serverURI);
+        return new PathsRequestBuilder(httpClient, serverURI);
     }
 
     /**
      * Returns {@link PaymentsRequestBuilder} instance.
      */
     public PaymentsRequestBuilder payments() {
-        return new PaymentsRequestBuilder(serverURI);
+        return new PaymentsRequestBuilder(httpClient, serverURI);
     }
 
     /**
      * Returns {@link TransactionsRequestBuilder} instance.
      */
     public TransactionsRequestBuilder transactions() {
-        return new TransactionsRequestBuilder(serverURI);
+        return new TransactionsRequestBuilder(httpClient, serverURI);
     }
 
     /**
      * Submits transaction to the network.
+     *
      * @param transaction transaction to submit to the network.
      * @return {@link SubmitTransactionResponse}
      * @throws IOException
@@ -141,6 +143,7 @@ public class Server {
 
     /**
      * To support mocking a client
+     *
      * @param httpClient
      */
     void setHttpClient(OkHttpClient httpClient) {

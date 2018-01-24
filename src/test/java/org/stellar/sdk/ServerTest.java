@@ -16,6 +16,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 import okhttp3.Response;
 import okhttp3.internal.http.StatusLine;
 
@@ -29,6 +30,8 @@ public class ServerTest extends TestCase {
     private Response mockResponse;
     @Mock
     private HttpEntity mockEntity;
+
+    private final StatusLine httpOK = new StatusLine(Protocol.HTTP_2, HttpStatus.SC_OK, "OK");
 
     private final StatusLine httpOK = new BasicStatusLine(HttpVersion.HTTP_1_1, HttpStatus.SC_OK, "OK");
     private final String successResponse =

@@ -1,12 +1,13 @@
 package org.stellar.sdk.requests;
 
+import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.launchdarkly.eventsource.EventHandler;
+import com.launchdarkly.eventsource.EventSource;
+import com.launchdarkly.eventsource.MessageEvent;
 
-import org.apache.http.client.fluent.Request;
-import org.glassfish.jersey.media.sse.EventSource;
-import org.glassfish.jersey.media.sse.InboundEvent;
-import org.glassfish.jersey.media.sse.SseFeature;
 import org.stellar.sdk.KeyPair;
+import org.stellar.sdk.federation.FederationResponse;
 import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.Page;
@@ -14,15 +15,9 @@ import org.stellar.sdk.responses.Page;
 import java.io.IOException;
 import java.net.URI;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import retrofit2.Retrofit;
 
 /**
  * Builds requests connected to accounts.
@@ -30,7 +25,7 @@ import retrofit2.Retrofit;
 public class AccountsRequestBuilder extends RequestBuilder {
 
     public AccountsRequestBuilder(OkHttpClient httpClient, URI serverURI) {
-        super(serverURI, "accounts");
+        super(httpClient, serverURI, "accounts");
     }
 
     /**
@@ -39,16 +34,9 @@ public class AccountsRequestBuilder extends RequestBuilder {
      *
      * @throws IOException
      */
-    public AccountResponse account(HttpUrl uri) throws IOException {
-        TypeToken type = new TypeToken<AccountResponse>() {
-        };
-        ResponseHandler<AccountResponse> responseHandler = new ResponseHandler<AccountResponse>(type);
-        Request request = new Request.Builder()
-                .url(uri.toString())
-                .build();
-        Response response = httpClient.
-
-        return (AccountResponse) Request.Get(uri).execute().handleResponse(responseHandler);
+    public AccountResponse account(URI uri) throws IOException {
+        Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
+        return GsonSingleton.getInstance().fromJson(response.body().toString(), AccountResponse.class);
     }
 
     /**
@@ -71,11 +59,9 @@ public class AccountsRequestBuilder extends RequestBuilder {
      * @throws TooManyRequestsException when too many requests were sent to the Horizon server.
      * @throws IOException
      */
-    public static Page<AccountResponse> execute(URI uri) throws IOException, TooManyRequestsException {
-        TypeToken type = new TypeToken<Page<AccountResponse>>() {
-        };
-        ResponseHandler<Page<AccountResponse>> responseHandler = new ResponseHandler<Page<AccountResponse>>(type);
-        return (Page<AccountResponse>) Request.Get(uri).execute().handleResponse(responseHandler);
+    public Page<AccountResponse> execute(URI uri) throws IOException, TooManyRequestsException {
+        Response response = httpClient.newCall(new Request.Builder().url(uri.toString()).build()).execute();
+        return GsonSingleton.getInstance().fromJson(response.body().toString(), Page<AccountResponse>.class);
     }
 
     /**
@@ -90,20 +76,39 @@ public class AccountsRequestBuilder extends RequestBuilder {
      * @see <a href="https://www.stellar.org/developers/horizon/learn/responses.html" target="_blank">Response Format documentation</a>
      */
     public EventSource stream(final EventListener<AccountResponse> listener) {
-        Client client = ClientBuilder.newBuilder().register(SseFeature.class).build();
-        WebTarget target = client.target(this.buildUri());
-        EventSource eventSource = new EventSource(target) {
+        EventHandler handler = new EventHandler() {
             @Override
-            public void onEvent(InboundEvent inboundEvent) {
-                String data = inboundEvent.readData(String.class);
-                if (data.equals("\"hello\"")) {
+            public void onOpen() throws Exception {
+
+            }
+
+            @Override
+            public void onClosed() throws Exception {
+
+            }
+
+            @Override
+            public void onMessage(String event, MessageEvent messageEvent) throws Exception {
+                if (messageEvent.getData().equals("\"hello\"")) {
                     return;
                 }
-                AccountResponse account = GsonSingleton.getInstance().fromJson(data, AccountResponse.class);
+                AccountResponse account = GsonSingleton.getInstance()
+                        .fromJson(messageEvent.getData(), AccountResponse.class);
                 listener.onEvent(account);
             }
+
+            @Override
+            public void onComment(String comment) throws Exception {
+
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
         };
-        return eventSource;
+
+        return new EventSource.Builder(handler, this.buildUri()).client(httpClient).build();
     }
 
     /**

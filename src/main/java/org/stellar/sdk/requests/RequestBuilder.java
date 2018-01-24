@@ -1,22 +1,24 @@
 package org.stellar.sdk.requests;
 
-import org.apache.http.client.utils.URIBuilder;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
 
 /**
  * Abstract class for request builders.
  */
 public abstract class RequestBuilder {
+
+    protected OkHttpClient httpClient;
     protected HttpUrl.Builder urlBuilder;
     private ArrayList<String> segments;
     private boolean segmentsAdded;
 
-    RequestBuilder(URI serverURI, String defaultSegment) {
+    RequestBuilder(OkHttpClient httpClient, URI serverURI, String defaultSegment) {
+        this.httpClient = httpClient;
         urlBuilder = HttpUrl.parse(serverURI.toString()).newBuilder();
         segments = new ArrayList<String>();
         if (defaultSegment != null) {
@@ -75,15 +77,15 @@ public abstract class RequestBuilder {
         return this;
     }
 
-    HttpUrl buildUri() {
+    URI buildUri() {
         if (segments.size() > 0) {
             String path = "";
             for (String segment : segments) {
                 path += "/" + segment;
             }
-            urlBuilder.setPath(path);
+            uriBuilder.setPath(path);
         }
-        return urlBuilder.build();
+        return urlBuilder.build().uri();
     }
 
     /**
