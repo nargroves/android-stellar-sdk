@@ -1,7 +1,16 @@
 package org.stellar.sdk;
 
 import org.apache.commons.io.IOUtils;
-import org.stellar.sdk.requests.*;
+import org.stellar.sdk.requests.AccountsRequestBuilder;
+import org.stellar.sdk.requests.EffectsRequestBuilder;
+import org.stellar.sdk.requests.LedgersRequestBuilder;
+import org.stellar.sdk.requests.OffersRequestBuilder;
+import org.stellar.sdk.requests.OperationsRequestBuilder;
+import org.stellar.sdk.requests.OrderBookRequestBuilder;
+import org.stellar.sdk.requests.PathsRequestBuilder;
+import org.stellar.sdk.requests.PaymentsRequestBuilder;
+import org.stellar.sdk.requests.TradesRequestBuilder;
+import org.stellar.sdk.requests.TransactionsRequestBuilder;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.SubmitTransactionResponse;
 
@@ -11,11 +20,12 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
+import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
-import retrofit2.Retrofit;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * Main class used to connect to Horizon server.
@@ -111,29 +121,26 @@ public class Server {
      * @throws IOException
      */
     public SubmitTransactionResponse submitTransaction(Transaction transaction) throws IOException {
-        URI transactionsURI;
-        try {
-            transactionsURI = new URIBuilder(serverURI).setPath("/transactions").build();
-        } catch (URISyntaxException e) {
-            throw new AssertionError(e);
-        }
-        HttpPost submitTransactionRequest = new HttpPost(transactionsURI);
+        String transactionsURI = serverURI + "/transactions";
 
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("tx", transaction.toEnvelopeXdrBase64()));
-        submitTransactionRequest.setEntity(new UrlEncodedFormEntity(params));
+        RequestBody formBody = new FormBody.Builder()
+                .add("tx", transaction.toEnvelopeXdrBase64())
+                .build();
 
-        HttpResponse response = httpClient.execute(submitTransactionRequest);
-        HttpEntity entity = response.getEntity();
+        Request submitTransactionRequest = new Request.Builder()
+                .url(transactionsURI)
+                .post(formBody)
+                .build();
 
-        if (entity != null) {
-            InputStream responseStream = entity.getContent();
+        Response response = httpClient.newCall(submitTransactionRequest).execute();
+
+        if (response.body() != null) {
+            InputStream responseStream = response.body().byteStream();
             try {
                 StringWriter writer = new StringWriter();
                 IOUtils.copy(responseStream, writer, StandardCharsets.UTF_8);
                 String responseString = writer.toString();
-                SubmitTransactionResponse submitTransactionResponse = GsonSingleton.getInstance().fromJson(responseString, SubmitTransactionResponse.class);
-                return submitTransactionResponse;
+                return GsonSingleton.getInstance().fromJson(responseString, SubmitTransactionResponse.class);
             } finally {
                 responseStream.close();
             }

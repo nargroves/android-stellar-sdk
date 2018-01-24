@@ -5,44 +5,42 @@ sourceCompatibility = 1.6
 version = '0.1.14'
 group = 'stellar'
 
-jar {
-    manifest {
-        attributes 'Implementation-Title': 'stellar-sdk',
-                   'Implementation-Version': version
-    }
-    archiveName 'stellar-sdk.jar'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-}
-
-publishing {
-    publications {
-        ivy(IvyPublication) {
-            from components.java
-        }
-    }
-    repositories {
-        ivy {
-            url "$projectDir/repos"
-        }
-    }
-}
+//jar {
+//    manifest {
+//        attributes 'Implementation-Title': 'stellar-sdk',
+//                   'Implementation-Version': version
+//    }
+//    archiveName 'stellar-sdk.jar'
+//    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+//}
+//
+//publishing {
+//    publications {
+//        ivy(IvyPublication) {
+//            from components.java
+//        }
+//    }
+//    repositories {
+//        ivy {
+//            url "$projectDir/repos"
+//        }
+//    }
+//}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
-
-    compile 'com.launchdarkly:okhttp-eventsource:1.7.0'
-    compile 'commons-codec:commons-codec:1.5'
-    compile 'com.moandjiezana.toml:toml4j:0.5.1'
-    compile 'org.mockito:mockito-core:2.0.31-beta'
-    compile 'com.google.guava:guava:18.0'
-    compile 'com.google.code.gson:gson:2.4'
-    compile 'commons-io:commons-io:2.4'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.launchdarkly:okhttp-eventsource:1.7.0'
+    implementation 'commons-codec:commons-codec:1.10'
+    implementation 'com.moandjiezana.toml:toml4j:0.5.1'
+    implementation 'org.mockito:mockito-core:2.8.47'
+    implementation 'com.google.code.gson:gson:2.8.1'
+    implementation 'commons-io:commons-io:2.4'
+    implementation 'com.google.guava:guava:23.3-android'
     compile fileTree(dir: 'libs', include: '*.jar')
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }

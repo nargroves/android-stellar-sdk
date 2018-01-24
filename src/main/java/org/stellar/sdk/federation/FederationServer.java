@@ -75,13 +75,10 @@ public class FederationServer {
      * @see <a href="https://www.stellar.org/developers/learn/concepts/stellar-toml.html" target="_blank">Stellar.toml docs</a>
      */
     public static FederationServer createForDomain(InternetDomainName domain) {
-        StringBuilder uriBuilder = new StringBuilder();
-        uriBuilder.append("");
-        uriBuilder.append(domain.toString());
-        uriBuilder.append("/.well-known/stellar.toml");
+        String uriBuilder = "https://" + domain.toString() + "/.well-known/stellar.toml";
 
         Request request = new Request.Builder()
-                .url(uriBuilder.toString())
+                .url(uriBuilder)
                 .build();
 
         Toml stellarToml;
