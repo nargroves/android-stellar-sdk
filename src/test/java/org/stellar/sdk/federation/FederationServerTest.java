@@ -4,16 +4,6 @@ import com.google.common.net.InternetDomainName;
 
 import junit.framework.TestCase;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.HttpVersion;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.message.BasicStatusLine;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,14 +18,18 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Response;
+import okhttp3.internal.http.StatusLine;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 public class FederationServerTest extends TestCase {
   @Mock
-  private HttpClient mockClient;
+  private OkHttpClient mockClient;
   @Mock
-  private HttpResponse mockResponse;
+  private Response mockResponse;
   @Mock
   private HttpEntity mockEntity;
 

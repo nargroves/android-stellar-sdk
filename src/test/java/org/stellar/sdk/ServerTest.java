@@ -2,14 +2,6 @@ package org.stellar.sdk;
 
 import junit.framework.TestCase;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.HttpVersion;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicStatusLine;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,14 +15,18 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Response;
+import okhttp3.internal.http.StatusLine;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 public class ServerTest extends TestCase {
     @Mock
-    private HttpClient mockClient;
+    private OkHttpClient mockClient;
     @Mock
-    private HttpResponse mockResponse;
+    private Response mockResponse;
     @Mock
     private HttpEntity mockEntity;
 

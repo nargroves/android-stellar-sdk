@@ -1,15 +1,6 @@
 package org.stellar.sdk;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.stellar.sdk.requests.*;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.SubmitTransactionResponse;
@@ -23,12 +14,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+
 /**
  * Main class used to connect to Horizon server.
  */
 public class Server {
     private URI serverURI;
-    private HttpClient httpClient = HttpClients.createDefault();
+    private OkHttpClient httpClient = new OkHttpClient();
 
     public Server(String uri) {
         try {
@@ -42,7 +36,7 @@ public class Server {
      * Returns {@link AccountsRequestBuilder} instance.
      */
     public AccountsRequestBuilder accounts() {
-        return new AccountsRequestBuilder(serverURI);
+        return new AccountsRequestBuilder(httpClient, serverURI);
     }
 
     /**
@@ -149,7 +143,7 @@ public class Server {
      * To support mocking a client
      * @param httpClient
      */
-    void setHttpClient(HttpClient httpClient) {
+    void setHttpClient(OkHttpClient httpClient) {
         this.httpClient = httpClient;
     }
 }
