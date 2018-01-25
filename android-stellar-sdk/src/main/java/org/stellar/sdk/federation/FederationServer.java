@@ -1,7 +1,6 @@
 package org.stellar.sdk.federation;
 
 import com.google.common.net.InternetDomainName;
-import com.google.gson.Gson;
 import com.moandjiezana.toml.Toml;
 
 import org.stellar.sdk.responses.GsonSingleton;
