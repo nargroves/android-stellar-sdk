@@ -35,28 +35,23 @@ ext {
     allLicenses = ["Apache-2.0"]
 }
 
-tasks.withType(Javadoc) {
-    options.addStringOption('Xdoclint:none', '-quiet')
-    options.addStringOption('encoding', 'UTF-8')
-    options.addStringOption('charSet', 'UTF-8')
-}
-
 repositories {
     mavenCentral()
     jcenter()
 }
 
 dependencies {
-    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0' //done
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0' //done
     implementation 'com.launchdarkly:okhttp-eventsource:1.7.0'
     implementation 'commons-codec:commons-codec:1.10'
     implementation 'com.moandjiezana.toml:toml4j:0.5.1'
-    implementation 'org.mockito:mockito-core:2.8.47'
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation 'commons-io:commons-io:2.4'
     implementation 'com.google.guava:guava:23.3-android'
     implementation fileTree(dir: 'libs', include: '*.jar')
+    testImplementation 'org.mockito:mockito-core:2.13.0'
+    androidTestImplementation 'org.mockito:mockito-android:2.13.0'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 

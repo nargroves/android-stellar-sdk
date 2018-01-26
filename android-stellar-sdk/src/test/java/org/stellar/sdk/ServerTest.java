@@ -17,7 +17,10 @@ import java.nio.charset.StandardCharsets;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import okhttp3.internal.http.StatusLine;
 
 import static org.mockito.Matchers.any;
@@ -29,11 +32,9 @@ public class ServerTest extends TestCase {
     @Mock
     private Response mockResponse;
     @Mock
-    private HttpEntity mockEntity;
+    private ResponseBody mockEntity;
 
-    private final StatusLine httpOK = new StatusLine(Protocol.HTTP_2, HttpStatus.SC_OK, "OK");
-
-    private final StatusLine httpOK = new BasicStatusLine(HttpVersion.HTTP_1_1, HttpStatus.SC_OK, "OK");
+    private final StatusLine httpOK = new StatusLine(Protocol.HTTP_1_1, 200, "OK");
     private final String successResponse =
             "{\n" +
             "  \"_links\": {\n" +
@@ -48,7 +49,7 @@ public class ServerTest extends TestCase {
             "  \"result_meta_xdr\": \"AAAAAAAAAAEAAAACAAAAAAAMmyYAAAAAAAAAAG2EKvHpNRorZjQVJaBp3rX1sUqcZbICuPF4uunSC9zKAAAAAAvrwgAADJsmAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAQAMmyYAAAAAAAAAAKu3N77S+cHLEDfVD2eW/CqRiN9yvAKH+qkeLjHQs1u+AAAAFzCfYtQADJKDAAAAAwAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA\"\n" +
             "}";
 
-    private final StatusLine httpBadRequest = new BasicStatusLine(HttpVersion.HTTP_1_1, HttpStatus.SC_BAD_REQUEST, "Bad Request");
+    private final StatusLine httpBadRequest = new StatusLine(Protocol.HTTP_1_1, 404, "Bad Request");
     private final String failureResponse =
             "{\n" +
             "  \"type\": \"https://stellar.org/horizon-errors/transaction_failed\",\n" +
@@ -78,8 +79,13 @@ public class ServerTest extends TestCase {
         server = new Server("https://horizon.stellar.org");
         server.setHttpClient(mockClient);
 
-        when(mockResponse.getEntity()).thenReturn(mockEntity);
-        when(mockClient.execute((HttpPost) any())).thenReturn(mockResponse);
+        when(mockResponse.body()).thenReturn(mockEntity);
+        when(mockClient
+                .newCall(((Request) any()).newBuilder()
+                        .post(((RequestBody) any()))
+                        .build())
+                .execute())
+                .thenReturn(mockResponse);
     }
 
     @After
@@ -108,8 +114,8 @@ public class ServerTest extends TestCase {
     @Test
     public void testSubmitTransactionSuccess() throws IOException {
         InputStream jsonResponse = new ByteArrayInputStream(successResponse.getBytes(StandardCharsets.UTF_8));
-        when(mockResponse.getStatusLine()).thenReturn(httpOK);
-        when(mockEntity.getContent()).thenReturn(jsonResponse);
+        when(StatusLine.get(mockResponse)).thenReturn(httpOK);
+        when(mockEntity.byteStream()).thenReturn(jsonResponse);
 
         SubmitTransactionResponse response = server.submitTransaction(this.buildTransaction());
         assertTrue(response.isSuccess());
@@ -121,8 +127,8 @@ public class ServerTest extends TestCase {
     @Test
     public void testSubmitTransactionFail() throws IOException {
         InputStream jsonResponse = new ByteArrayInputStream(failureResponse.getBytes(StandardCharsets.UTF_8));
-        when(mockResponse.getStatusLine()).thenReturn(httpBadRequest);
-        when(mockEntity.getContent()).thenReturn(jsonResponse);
+        when(StatusLine.get(mockResponse)).thenReturn(httpBadRequest);
+        when(mockEntity.byteStream()).thenReturn(jsonResponse);
 
         SubmitTransactionResponse response = server.submitTransaction(this.buildTransaction());
         assertFalse(response.isSuccess());

@@ -18,99 +18,134 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
+import javax.annotation.Nullable;
+
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import okhttp3.internal.http.StatusLine;
+import okio.BufferedSource;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class FederationServerTest extends TestCase {
-  @Mock
-  private OkHttpClient mockClient;
-  @Mock
-  private Response mockResponse;
-  @Mock
-  private HttpEntity mockEntity;
 
-  private FederationServer server;
+    private OkHttpClient mockClient;
 
-  private final StatusLine httpOK = new BasicStatusLine(HttpVersion.HTTP_1_1, HttpStatus.SC_OK, "OK");
-  private final String successResponse =
-          "{\"stellar_address\":\"bob*stellar.org\",\"account_id\":\"GCW667JUHCOP5Y7KY6KGDHNPHFM4CS3FCBQ7QWDUALXTX3PGXLSOEALY\"}";
-  private final String successResponseWithMemo =
-          "{\"stellar_address\":\"bob*stellar.org\",\"account_id\":\"GCW667JUHCOP5Y7KY6KGDHNPHFM4CS3FCBQ7QWDUALXTX3PGXLSOEALY\", \"memo_type\": \"text\", \"memo\": \"test\"}";
+    private Request mockRequest;
 
-  private final StatusLine httpNotFound = new BasicStatusLine(HttpVersion.HTTP_1_1, HttpStatus.SC_NOT_FOUND, "Not Found");
-  private final String notFoundResponse =
-          "{\"code\":\"not_found\",\"message\":\"Account not found\"}";
+    private Response mockResponse;
 
-  private final String stellarToml =
-          "FEDERATION_SERVER = \"https://api.stellar.org/federation\"";
+    private ResponseBody mockEntity;
 
-  @Before
-  public void setUp() throws URISyntaxException, IOException {
-    MockitoAnnotations.initMocks(this);
-    server = new FederationServer(
-            "https://api.stellar.org/federation",
-            InternetDomainName.from("stellar.org")
-    );
-    FederationServer.setHttpClient(mockClient);
+    private FederationServer server;
 
-    when(mockResponse.getEntity()).thenReturn(mockEntity);
-    when(mockClient.execute((HttpGet) any(), (HttpClientContext) any())).thenReturn(mockResponse);
-  }
+    private final StatusLine httpOK = new StatusLine(Protocol.HTTP_1_1, 200, "OK");
+    private final String successResponse =
+            "{\"stellar_address\":\"bob*stellar.org\",\"account_id\":\"GCW667JUHCOP5Y7KY6KGDHNPHFM4CS3FCBQ7QWDUALXTX3PGXLSOEALY\"}";
+    private final String successResponseWithMemo =
+            "{\"stellar_address\":\"bob*stellar.org\",\"account_id\":\"GCW667JUHCOP5Y7KY6KGDHNPHFM4CS3FCBQ7QWDUALXTX3PGXLSOEALY\", \"memo_type\": \"text\", \"memo\": \"test\"}";
 
-  @Test
-  public void testCreateForDomain() throws IOException {
-    InputStream response = new ByteArrayInputStream(stellarToml.getBytes(StandardCharsets.UTF_8));
-    when(mockResponse.getStatusLine()).thenReturn(httpOK);
-    when(mockEntity.getContent()).thenReturn(response);
+    private final StatusLine httpNotFound = new StatusLine(Protocol.HTTP_1_1, 404, "Not Found");
+    private final String notFoundResponse =
+            "{\"code\":\"not_found\",\"message\":\"Account not found\"}";
 
-    FederationServer server = FederationServer.createForDomain(InternetDomainName.from("stellar.org"));
-    assertEquals(server.getServerUri().toString(), "https://api.stellar.org/federation");
-    assertEquals(server.getDomain().toString(), "stellar.org");
+    private final String stellarToml =
+            "FEDERATION_SERVER = \"https://api.stellar.org/federation\"";
 
-    ArgumentCaptor<HttpUriRequest> argument = ArgumentCaptor.forClass(HttpUriRequest.class);
-    Mockito.verify(mockClient).execute(argument.capture(), (HttpClientContext) any());
-    assertEquals(URI.create("https://stellar.org/.well-known/stellar.toml"), argument.getValue().getURI());
-  }
+    @Before
+    public void setUp() throws URISyntaxException, IOException {
+        MockitoAnnotations.initMocks(this);
+        server = new FederationServer(
+                "https://api.stellar.org/federation",
+                InternetDomainName.from("stellar.org")
+        );
+        FederationServer.setHttpClient(mockClient);
 
-  @Test
-  public void testNameFederationSuccess() throws IOException {
-    InputStream jsonResponse = new ByteArrayInputStream(successResponse.getBytes(StandardCharsets.UTF_8));
-    when(mockResponse.getStatusLine()).thenReturn(httpOK);
-    when(mockEntity.getContent()).thenReturn(jsonResponse);
+        mockClient = new OkHttpClient.Builder().build();
+        mockRequest = new Request.Builder().url("https://api.stellar.org/federation").build();
+        mockResponse = new Response.Builder().build();
+        mockEntity = new ResponseBody() {
+            @Nullable
+            @Override
+            public MediaType contentType() {
+                return null;
+            }
 
-    FederationResponse response = server.resolveAddress("bob*stellar.org");
-    assertEquals(response.getStellarAddress(), "bob*stellar.org");
-    assertEquals(response.getAccountId(), "GCW667JUHCOP5Y7KY6KGDHNPHFM4CS3FCBQ7QWDUALXTX3PGXLSOEALY");
-    assertNull(response.getMemoType());
-    assertNull(response.getMemo());
-  }
+            @Override
+            public long contentLength() {
+                return 0;
+            }
 
-  @Test
-  public void testNameFederationSuccessWithMemo() throws IOException {
-    InputStream jsonResponse = new ByteArrayInputStream(successResponseWithMemo.getBytes(StandardCharsets.UTF_8));
-    when(mockResponse.getStatusLine()).thenReturn(httpOK);
-    when(mockEntity.getContent()).thenReturn(jsonResponse);
+            @Override
+            public BufferedSource source() {
+                return null;
+            }
+        };
 
-    FederationResponse response = server.resolveAddress("bob*stellar.org");
-    assertEquals(response.getStellarAddress(), "bob*stellar.org");
-    assertEquals(response.getAccountId(), "GCW667JUHCOP5Y7KY6KGDHNPHFM4CS3FCBQ7QWDUALXTX3PGXLSOEALY");
-    assertEquals(response.getMemoType(), "text");
-    assertEquals(response.getMemo(), "test");
-  }
 
-  @Test
-  public void testNameFederationNotFound() throws IOException {
-    InputStream jsonResponse = new ByteArrayInputStream(notFoundResponse.getBytes(StandardCharsets.UTF_8));
-    when(mockResponse.getStatusLine()).thenReturn(httpNotFound);
-    when(mockEntity.getContent()).thenReturn(jsonResponse);
+        when(mockResponse.body()).thenReturn(mockEntity);
+        when(mockClient.newCall(mockRequest).execute()).thenReturn(mockResponse);
+    }
 
-    try {
-      FederationResponse response = server.resolveAddress("bob*stellar.org");
-      fail("Expected exception");
-    } catch (NotFoundException e) {}
-  }
+    @Test
+    public void testCreateForDomain() throws IOException {
+        InputStream response = new ByteArrayInputStream(stellarToml.getBytes(StandardCharsets.UTF_8));
+        when(StatusLine.get(mockResponse)).thenReturn(httpOK);
+        when(mockEntity.byteStream()).thenReturn(response);
+
+        FederationServer server = FederationServer.createForDomain(InternetDomainName.from("stellar.org"));
+        assertEquals(server.getServerUri().toString(), "https://api.stellar.org/federation");
+        assertEquals(server.getDomain().toString(), "stellar.org");
+
+        ArgumentCaptor<Request> argument = ArgumentCaptor.forClass(Request.class);
+//        Mockito.verify(mockClient).execute(argument.capture(), (Request) any());
+        Mockito.verify(mockClient).newCall(argument.capture()).execute();
+        assertEquals(URI.create("https://stellar.org/.well-known/stellar.toml"), argument.getValue().url().uri());
+    }
+
+    @Test
+    public void testNameFederationSuccess() throws IOException {
+        InputStream jsonResponse = new ByteArrayInputStream(successResponse.getBytes(StandardCharsets.UTF_8));
+        when(StatusLine.get(mockResponse)).thenReturn(httpOK);
+        when(mockEntity.byteStream()).thenReturn(jsonResponse);
+
+        FederationResponse response = server.resolveAddress("bob*stellar.org");
+        assertEquals(response.getStellarAddress(), "bob*stellar.org");
+        assertEquals(response.getAccountId(), "GCW667JUHCOP5Y7KY6KGDHNPHFM4CS3FCBQ7QWDUALXTX3PGXLSOEALY");
+        assertNull(response.getMemoType());
+        assertNull(response.getMemo());
+    }
+
+    @Test
+    public void testNameFederationSuccessWithMemo() throws IOException {
+        InputStream jsonResponse = new ByteArrayInputStream(successResponseWithMemo.getBytes(StandardCharsets.UTF_8));
+        when(StatusLine.get(mockResponse)).thenReturn(httpOK);
+        when(mockEntity.byteStream()).thenReturn(jsonResponse);
+
+        FederationResponse response = server.resolveAddress("bob*stellar.org");
+        assertEquals(response.getStellarAddress(), "bob*stellar.org");
+        assertEquals(response.getAccountId(), "GCW667JUHCOP5Y7KY6KGDHNPHFM4CS3FCBQ7QWDUALXTX3PGXLSOEALY");
+        assertEquals(response.getMemoType(), "text");
+        assertEquals(response.getMemo(), "test");
+    }
+
+    @Test
+    public void testNameFederationNotFound() throws IOException {
+        InputStream jsonResponse = new ByteArrayInputStream(notFoundResponse.getBytes(StandardCharsets.UTF_8));
+        when(StatusLine.get(mockResponse)).thenReturn(httpNotFound);
+        when(mockEntity.byteStream()).thenReturn(jsonResponse);
+
+        try {
+            FederationResponse response = server.resolveAddress("bob*stellar.org");
+            fail("Expected exception");
+        } catch (NotFoundException e) {
+        }
+    }
 }
